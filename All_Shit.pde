@@ -7,127 +7,68 @@ byte addr =33;  // address of your I2C slave I Hate You HoneyWell
 int PwnPinA = 9;      // PWM connected to PWM pin 9
 int PwnPinB = 10;      // PWM connected to PWM pin 10
 int AtoDPin = 15;   // Connect to Analog 15
-int gitgui;
+int ProxPin = 7;   // Prox connected to PWM pin 7
 
 void setup()
 {
+  pinMode(ProxPin, INPUT);  // sets the PWM 7 as input for Prox
+  pinMode(AtoDPin, INPUT);  // sets the ana Pin 15 as input for AtoD
+  pinMode(PwnPinB, OUTPUT); // Set PWM pin 10 as output for PWM
+  pinMode(PwnPinA, OUTPUT); // Set PWM pin 9 as output for PWM
+  
   Serial.begin(9600);
 }
 
 void loop()
 {
- 
   
+  // throw compass at him
+  // throw atod at him
+  // throw prox voltage at him
   
-}
-
-void SetPinLow(int pin)
-{
-
-  pinMode(pin, OUTPUT); // set pin to Output
-
-  digitalWrite(pin, LOW); 
+  compass();
+  AtoD();
+  prox();
+  delay(1000);
   
 }
 
-void SetPinHigh(int pin)
+void PO(int pin, int power)
 {
-
-  pinMode(pin, OUTPUT); // set pin to Output
-
-  digitalWrite(pin, HIGH); 
   
+  pinMode(pin, OUTPUT);
+  
+  if (power == 1)
+      digitalWrite(pin, HIGH); 
+  if (power == 0)
+      digitalWrite(pin, LOW);
+
 }
 
 void AtoD()
 {
 
   int angval = 0;
-  pinMode(AtoDPin, INPUT);  // sets the digital pin 7 as input
 
-  angval = analogRead(AtoDPin);   // read the input pin
+  angval = analogRead(AtoDPin);  // read the input pin
+  Serial.print("A to D Is:");
   Serial.println(angval);
 
 }
 
-void PWMB()
+void PM(int pin, int duty)
 {
-
-  int incomingByte = 0;
-  int usenumber = 0;
-  int val = 0; // variable to store the read value
-  int count = 2;
-  int temp;
-
-  pinMode(PwnPinB, OUTPUT); 
- // Must set a pin for input or output before use
- // Set pin for output
   
-  while(count >= 0)
-  {
-    if (Serial.available() > 0)
-    {
-    incomingByte = Serial.read();
-    usenumber = incomingByte - 48;
-    temp = count;
-    while(temp > 0)
-    {
-    usenumber = usenumber * 10;
-    temp--;
-    }
-    val = val + usenumber;
-    count --;
-    }
-  }
-  
+  // Pin Must Be 9 Or 10
+  int val = 0;
+  val = duty * 255;
   Serial.print("Writing: ");
   Serial.println(val);
-  analogWrite(PwnPinB, val );   // analogRead values go from 0 to 1023, analogWrite values from 0 to 255
-  val = 0;
-  count = 2;
-
+  analogWrite(pin, val );   // analogWrite values from 0 to 255
+  
 }
 
-void PWMA()
-{
-
-  int PwnPinA = 9;      // LED connected to digital pin 9
-  int incomingByte = 0;
-  int usenumber = 0;
-  int val = 0; // variable to store the read value
-  int count = 2;
-  int temp;
-
-  pinMode(PwnPinA, OUTPUT);
-  // Must set a pin for input or output before use
-  // Set pin for output
-   
-  while(count >= 0)
-  {
-    if (Serial.available() > 0)
-    {
-    incomingByte = Serial.read();
-    usenumber = incomingByte - 48;
-    temp = count;
-    while(temp > 0)
-    {
-    usenumber = usenumber * 10;
-    temp--;
-    }
-    val = val + usenumber;
-    count --;
-    }
-  }
-  
-  Serial.print("Writing: ");
-  Serial.println(val);
-  analogWrite(PwnPinA, val );   // analogRead values go from 0 to 1023, analogWrite values from 0 to 255
-  val = 0;
-  count = 2;
-  
-} 
-
-int compass()
+void compass()
 {
   
   byte data[2];
@@ -159,9 +100,30 @@ int compass()
   Serial.print(".");
   Serial.print(int (headingValue % 10));     // The fractional part of the heading
   Serial.println(" degrees");
-  delay(1000);
-  return headingValue;
+  //delay(1000);
   
 } 
 
+void prox()
 
+{
+  int val = 0;
+  int count = 0;
+  pinMode(ProxPin, INPUT);  // sets the digital pin 7 as input
+  val = digitalRead(ProxPin);   // read the 7 input pin
+  /*
+  if (val == HIGH)
+    {
+    Serial.print("High.\n");
+    count++;
+    }
+  else
+    Serial.print("Low.\n");
+    
+    val = LOW;
+   //delay(500);
+   */
+   Serial.print("Prox Voltage: ");
+   Serial.println(val);
+
+}
