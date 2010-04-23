@@ -11,6 +11,7 @@ int ProxPin = 7;   // Prox connected to PWM pin 7
 int PinSetA = 12;
 int PinSetB = 13;
 
+int val = 0;
 int PinSet = 1;
 
 void setup()
@@ -41,6 +42,10 @@ void loop()
   //prox();
   //if (PinSet == 1)
   PO(PinSetA,1);
+  delay(10000);
+  PO(PinSetA,0);
+  delay(10000);
+  PO(PinSetB,0);
   PM(PwnPinA,.5);
   
 }
@@ -67,12 +72,13 @@ void AtoD()
 
 }
 
-void PM(int pin, int duty)
+void PM(int pin, float duty)
 {
   
   // Pin Must Be 9 Or 10
-  int val = 0;
+ 
   val = duty * 255;
+ 
   Serial.print("Writing: ");
   Serial.println(val);
   analogWrite(pin, val );   // analogWrite values from 0 to 255
